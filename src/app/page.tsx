@@ -59,7 +59,7 @@ export default function Home() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto rounded-2xl p-5">
+    <div id="main" className="max-w-4xl mx-auto rounded-2xl p-5">
       <h1 className="text-center font-bold text-4xl flex p-5">
         TODO APPLICATION
       </h1>
