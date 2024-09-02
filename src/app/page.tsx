@@ -1,6 +1,12 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Home() {
+  // Defining State
+
+  const [todos, setTodos] = useState([{ task: "Solve LeetCode" }]);
+  const [inputVal,setInput] = useState("");
   return (
     // Main div
     <div className="max-w-4xl  mx-auto  rounded-2xl p-5 ">
@@ -10,6 +16,8 @@ export default function Home() {
       {/* INPUT */}
       <div className="flex justify-between py-10">
         <input
+        type="text"
+        onChange={() => console.log("onchange fire")}
           placeholder="Write your task here"
           className=" w-[80%] rounded-2xl text-lg px-5 text-green-950"
         />
@@ -26,20 +34,25 @@ export default function Home() {
       {/* COLOUMNS */}
       <div className="grid grid-cols-2 gap-4 mt-6">
         {/* Grid Items */}
-        <div>
-          <div>
-            <span>
-              1
-
-            </span>
-            <span>X</span>
-          </div>
-          {/* Task Content */}
-          <div>TasK Titless</div>
-        </div>
-
-      
-        <div className="bg-blue-700">09</div>
+        {todos.map((item: any, i: any) => {
+          return (
+            <div className="shadow p-4 text-lg">
+              <div className="flex justify-between ">
+                <span className="rounded-full shadow h-8 w-8   text-center  ">
+                  1
+                </span>
+                <span className="rounded-full shadow h-8 w-8 cursor-pointer text-red-700  text-center ">
+                  X
+                </span>
+              </div>
+              {/* Task Content */}
+              <div className="mt-5 text-30px text-gray-600">{item.task}</div>
+              <div>
+                <button className="text-right cursor-pointer">Delete</button>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
