@@ -19,8 +19,8 @@ export default function Home() {
         </button>
         {/* INPUT End */}
         {/* TASK LIST */}
-        <h1 className="text-center text-[40px] underline mt-5">TASK LIST</h1>
       </div>
+        <h1 className="text-center text-[40px] underline mt-5 justify-center flex items-center">TASK LIST</h1>
     </div>
   );
 }
