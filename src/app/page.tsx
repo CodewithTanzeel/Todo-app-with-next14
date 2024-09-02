@@ -36,7 +36,7 @@ export default function Home() {
         {/* Grid Items */}
         {todos.map((item: any, i: any) => {
           return (
-            <div className="shadow p-4 text-lg">
+            <div className="shadow p-4 text-lg" key={i}>
               <div className="flex justify-between ">
                 <span className="rounded-full shadow h-8 w-8   text-center  ">
                   1
