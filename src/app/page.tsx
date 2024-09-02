@@ -20,7 +20,27 @@ export default function Home() {
         {/* INPUT End */}
         {/* TASK LIST */}
       </div>
-        <h1 className="text-center text-[40px] underline mt-5 justify-center flex items-center">TASK LIST</h1>
+      <h1 className="text-center text-[40px] underline mt-5 justify-center flex items-center">
+        TASK LIST
+      </h1>
+      {/* COLOUMNS */}
+      <div className="grid grid-cols-2 gap-4 mt-6">
+        {/* Grid Items */}
+        <div>
+          <div>
+            <span>
+              1
+
+            </span>
+            <span>X</span>
+          </div>
+          {/* Task Content */}
+          <div>TasK Titless</div>
+        </div>
+
+      
+        <div className="bg-blue-700">09</div>
+      </div>
     </div>
   );
 }
