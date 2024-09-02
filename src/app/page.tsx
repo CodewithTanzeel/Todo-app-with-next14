@@ -9,7 +9,6 @@ export default function Home() {
   // Funtion for addTask
   const addItem = () => {
     setTodos([...todos, { task: inputVal }]);
-    setInput("");
   };
   const [inputVal, setInput] = useState("");
   // console.log("inputva",inputVal)
@@ -48,6 +47,9 @@ export default function Home() {
           return (
             <div className="shadow p-4 text-lg" key={i}>
               <div className="flex justify-between ">
+                <span className="rounded-full shadow h-8 w-8   text-center  ">
+                  1
+                </span>
                 <span className="rounded-full shadow h-8 w-8 cursor-pointer text-red-700  text-center ">
                   X
                 </span>
