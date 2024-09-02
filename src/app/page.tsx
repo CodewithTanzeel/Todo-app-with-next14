@@ -6,7 +6,8 @@ export default function Home() {
   // Defining State
 
   const [todos, setTodos] = useState([{ task: "Solve LeetCode" }]);
-  const [inputVal,setInput] = useState("");
+  const [inputVal, setInput] = useState("");
+  // console.log("inputva",inputVal)
   return (
     // Main div
     <div className="max-w-4xl  mx-auto  rounded-2xl p-5 ">
@@ -16,8 +17,10 @@ export default function Home() {
       {/* INPUT */}
       <div className="flex justify-between py-10">
         <input
-        type="text"
-        onChange={() => console.log("onchange fire")}
+          type="text"
+          value={inputVal}
+          onChange={(e) => setInput(e.target.value)}
+          
           placeholder="Write your task here"
           className=" w-[80%] rounded-2xl text-lg px-5 text-green-950"
         />
