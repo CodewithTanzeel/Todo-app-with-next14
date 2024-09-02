@@ -6,6 +6,11 @@ export default function Home() {
   // Defining State
 
   const [todos, setTodos] = useState([{ task: "Solve LeetCode" }]);
+  // Funtion for addTask
+  const addItem = () => {
+    setTodos([...todos, { task: inputVal }]);
+    setInput("");
+  };
   const [inputVal, setInput] = useState("");
   // console.log("inputva",inputVal)
   return (
@@ -20,12 +25,14 @@ export default function Home() {
           type="text"
           value={inputVal}
           onChange={(e) => setInput(e.target.value)}
-          
           placeholder="Write your task here"
           className=" w-[80%] rounded-2xl text-lg px-5 text-green-950"
         />
 
-        <button className="bg-green-950 text-white rounded-2xl p-3">
+        <button
+          className="bg-green-950 text-white rounded-2xl p-3"
+          onClick={addItem}
+        >
           ADD TASK
         </button>
         {/* INPUT End */}
@@ -41,9 +48,6 @@ export default function Home() {
           return (
             <div className="shadow p-4 text-lg" key={i}>
               <div className="flex justify-between ">
-                <span className="rounded-full shadow h-8 w-8   text-center  ">
-                  1
-                </span>
                 <span className="rounded-full shadow h-8 w-8 cursor-pointer text-red-700  text-center ">
                   X
                 </span>
@@ -51,7 +55,7 @@ export default function Home() {
               {/* Task Content */}
               <div className="mt-5 text-30px text-gray-600">{item.task}</div>
               <div>
-                <button className="text-right cursor-pointer">Delete</button>
+                <button className="text-right cursor-pointer">Edit</button>
               </div>
             </div>
           );
