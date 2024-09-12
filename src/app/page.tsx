@@ -1,122 +1,94 @@
-"use client";
-import { useState } from "react";
+import { prisma } from "./db";
+import { revalidatePath } from "next/cache";
 
-// Define the TypeScript interface for a Todo item
-interface Todo {
-  id: number; // Unique identifier for each task, should be a number under 2 digits
-  task: string; // The task description
+async function getData() {
+  const data = await prisma.todo.findMany({
+    select: {
+      title: true,
+      id: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return data;
 }
 
-export default function Home() {
-  // Initialize state with a counter for the next ID
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, task: "Solve LeetCode" },
-  ]);
-  const [inputVal, setInput] = useState("");
-  const [editMode, setEditMode] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
-  const [nextId, setNextId] = useState<number>(2); // Start with ID 2
+async function create(data: FormData) {
+  "use server";
+  const title = data.get("input")?.valueOf();
+  if (typeof title !== "string" || title.length === 0) {
+    throw new Error("Invalid Title");
+  }
+  await prisma.todo.create({ data: { title: title } });
+  revalidatePath("/");
+}
 
-  // Function to add a new task to the list
-  const addItem = () => {
-    if (inputVal.trim()) {
-      // Ensure input is not empty
-      setTodos([
-        ...todos,
-        { id: nextId % 100, task: inputVal }, // Use modulo to keep ID under 2 digits
-      ]);
-      setInput(""); // Clear the input field after adding
-      setNextId((prevId) => (prevId + 1) % 100); // Increment ID, reset to 0 after 99
-    }
-  };
+async function deleteItem(data: FormData) {
+  "use server";
+  const inputId = data.get("inputId")?.valueOf();
+  if (typeof inputId !== "string" || inputId.length === 0) {
+    throw new Error("Invalid Id");
+  }
+  await prisma.todo.delete({ where: { id: inputId } });
+  revalidatePath("/");
+}
 
-  // Function to delete a task by its ID
-  const deleteItem = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id)); // Remove task with the given ID
-  };
-
-  // Function to prepare a task for editing
-  const editItem = (id: number) => {
-    const taskToEdit = todos.find((todo) => todo.id === id); // Find the task to edit
-    if (taskToEdit) {
-      setInput(taskToEdit.task); // Set input value to the task's current value
-      setEditMode(true); // Enable edit mode
-      setEditId(id); // Set the ID of the task being edited
-    }
-  };
-
-  // Function to save the edited task and exit edit mode
-  const saveEdit = () => {
-    if (inputVal.trim() && editId !== null) {
-      // Ensure input is not empty
-      setTodos(
-        todos.map((todo) =>
-          todo.id === editId ? { ...todo, task: inputVal } : todo
-        ) // Update the task with the new value
-      );
-      setInput(""); // Clear the input field
-      setEditMode(false); // Disable edit mode
-      setEditId(null); // Clear the edit ID
-    }
-  };
-
+export default async function Home() {
+  const data = await getData();
   return (
-    <div id="main" className="max-w-4xl mx-auto rounded-2xl p-5">
-      <h1 className="text-center font-bold text-5xl flex p-5 shadow-white hover:text-zinc-100">
-        TODO APPLICATION
-      </h1>
-      {/* Input field and button for adding/editing tasks */}
-      <div className="flex flex-col md:flex-row justify-between items-center py-7">
-        <input
-          type="text"
-          value={inputVal}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Write your task here"
-          className="w-full md:w-[80%] rounded-2xl text-lg px-5 py-2 text-green-950 mb-4 md:mb-0"
-        />
-        <button
-          className="bg-gray-900 text-white rounded-2xl ml-4 px-4 py-[1.5px] flex items-center hover:bg-zinc-200 hover:text-gray-950"
-          onClick={editMode ? saveEdit : addItem} // Toggle between add and save actions
-        >
-          {editMode ? "Save" : "ADD TASK"}
-        </button>
-      </div>
-      <h2 className="text-center text-[20px] text-slate-800 hover:text-zinc-100 mt-5 flex items-center justify-center">
-        TASK LIST
-      </h2>
-      {/* List of tasks */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-        {todos.map((item) => (
-          <div
-            className="shadow rounded-3xl p-4 text-lg bg-gray-800 text-white hover:bg-gray-700"
-            key={item.id}
-          >
-            <div className="flex justify-between">
-              <span className="rounded-full shadow h-8 w-8 text-center bg-white text-gray-900">
-                {item.id < 10 ? `0${item.id}` : item.id}{" "}
-                {/* Format ID to be two digits */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 p-8">
+      <div className="max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <div className="px-8 pt-8 pb-6">
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-6">
+            Awesome Todo List
+          </h1>
+          <form action={create} className="mb-6 flex gap-2">
+            <input
+              type="text"
+              name="input"
+              className="flex-grow rounded-full border-2 border-purple-300 px-4 py-2 text-purple-900 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition duration-300 ease-in-out"
+              placeholder="Add a new task..."
+            />
+            <button
+              type="submit"
+              className="bg-gradient-to-r from-purple-400 to-pink-500 text-white font-bold py-2 px-6 rounded-full hover:from-purple-500 hover:to-pink-600 transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              Add
+            </button>
+          </form>
+        </div>
+        <ul className="divide-y divide-purple-100">
+          {data.map((todo) => (
+            <li
+              key={todo.id}
+              className="flex items-center gap-4 px-8 py-4 hover:bg-purple-50 transition duration-300 ease-in-out"
+            >
+              <span className="flex-grow text-purple-900 font-medium">
+                {todo.title}
               </span>
-              <span
-                className="rounded-full shadow-red-400 h-8 w-8 cursor-pointer text-red-700 text-center"
-                onClick={() => deleteItem(item.id)} // Handle task deletion
-              >
-                X
-              </span>
-            </div>
-            {/* Display the task content */}
-            <div className="mt-5 text-xl text-white hover:text-cyan-200">
-              {item.task}
-            </div>
-            <div>
-              <button
-                className="text-right cursor-pointer text-sm text-blue-400 hover:text-blue-600"
-                onClick={() => editItem(item.id)} // Handle task editing
-              >
-                Edit
-              </button>
-            </div>
-          </div>
-        ))}
+              <form action={deleteItem}>
+                <input type="hidden" name="inputId" value={todo.id} />
+                <button className="text-pink-500 hover:text-pink-700 transition duration-300 ease-in-out transform hover:scale-110">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
+                </button>
+              </form>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
